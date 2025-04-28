@@ -4,86 +4,89 @@ local correctPassword = "yourpassword"
 -- Disable termination
 os.pullEvent = os.pullEventRaw
 
--- Clear screen
-term.clear()
-term.setCursorPos(1,1)
-
--- Get screen size
-local w, h = term.getSize()
-
--- Centered "Enter Password" text
-local enterText = "Enter Password:"
-term.setCursorPos(math.floor((w - #enterText) / 2), math.floor(h / 2) - 2)
-print(enterText)
-
--- Draw a simple input box
-local boxWidth = 20
-local boxStartX = math.floor((w - boxWidth) / 2)
-local boxY = math.floor(h / 2)
-
--- Draw top of box
-term.setCursorPos(boxStartX, boxY)
-write("+" .. string.rep("-", boxWidth - 2) .. "+")
-
--- Draw middle (where typing will happen)
-term.setCursorPos(boxStartX, boxY + 1)
-write("|" .. string.rep(" ", boxWidth - 2) .. "|")
-
--- Draw bottom of box
-term.setCursorPos(boxStartX, boxY + 2)
-write("+" .. string.rep("-", boxWidth - 2) .. "+")
-
--- Move cursor inside the box for typing
-term.setCursorPos(boxStartX + 1, boxY + 1)
-
--- Custom hidden password input
-local input = ""
 while true do
-    local event, param = os.pullEvent()
-    if event == "char" then
-        if #input < (boxWidth - 2) then
-            input = input .. param
-            term.write("X")
-        end
-    elseif event == "key" then
-        if param == keys.enter then
-            break
-        elseif param == keys.backspace then
-            if #input > 0 then
-                -- Remove last character
-                input = string.sub(input, 1, #input - 1)
-                -- Move cursor back, erase character, move back again
-                local x, y = term.getCursorPos()
-                term.setCursorPos(x-1, y)
-                term.write(" ")
-                term.setCursorPos(x-1, y)
+    -- Clear screen
+    term.clear()
+    term.setCursorPos(1,1)
+
+    -- Get screen size
+    local w, h = term.getSize()
+
+    -- Centered "Enter Password" text
+    local enterText = "Enter Password:"
+    term.setCursorPos(math.floor((w - #enterText) / 2), math.floor(h / 2) - 2)
+    print(enterText)
+
+    -- Draw a simple input box
+    local boxWidth = 20
+    local boxStartX = math.floor((w - boxWidth) / 2)
+    local boxY = math.floor(h / 2)
+
+    -- Draw top of box
+    term.setCursorPos(boxStartX, boxY)
+    write("+" .. string.rep("-", boxWidth - 2) .. "+")
+
+    -- Draw middle (where typing will happen)
+    term.setCursorPos(boxStartX, boxY + 1)
+    write("|" .. string.rep(" ", boxWidth - 2) .. "|")
+
+    -- Draw bottom of box
+    term.setCursorPos(boxStartX, boxY + 2)
+    write("+" .. string.rep("-", boxWidth - 2) .. "+")
+
+    -- Move cursor inside the box for typing
+    term.setCursorPos(boxStartX + 1, boxY + 1)
+
+    -- Custom hidden password input
+    local input = ""
+    while true do
+        local event, param = os.pullEvent()
+        if event == "char" then
+            if #input < (boxWidth - 2) then
+                input = input .. param
+                term.write("X")
+            end
+        elseif event == "key" then
+            if param == keys.enter then
+                break
+            elseif param == keys.backspace then
+                if #input > 0 then
+                    local x, y = term.getCursorPos()
+                    input = string.sub(input, 1, #input - 1)
+                    term.setCursorPos(x-1, y)
+                    term.write(" ")
+                    term.setCursorPos(x-1, y)
+                end
             end
         end
     end
-end
 
--- Clear screen again
-term.clear()
-term.setCursorPos(1,1)
-
--- Centered "Access Granted" or "Access Denied"
-local message = ""
-
-if input == correctPassword then
-    message = "Access Granted"
-else
-    message = "Access Denied"
-end
-
--- Center the message
-term.setCursorPos(math.floor((w - #message) / 2), math.floor(h / 2))
-print(message)
-
--- If granted, move to main screen
-if input == correctPassword then
-    sleep(2)
+    -- Clear screen again
     term.clear()
     term.setCursorPos(1,1)
-    print("Main Screen:")
-    print("[File: Organizations]")
+
+    -- Check password (case insensitive)
+    if string.lower(input) == string.lower(correctPassword) then
+        -- ACCESS GRANTED
+        if term.isColor() then term.setTextColor(colors.green) end
+        local successText = "✔ ACCESS GRANTED ✔"
+        term.setCursorPos(math.floor((w - #successText) / 2), math.floor(h / 2))
+        print(successText)
+        if term.isColor() then term.setTextColor(colors.white) end
+        sleep(2)
+        term.clear()
+        term.setCursorPos(1,1)
+        print("Main Screen:")
+        print("[File: Organizations]")
+        break -- Exit loop and stay in main screen
+    else
+        -- ACCESS DENIED
+        if term.isColor() then term.setTextColor(colors.red) end
+        local failText = "✖ ACCESS DENIED ✖"
+        term.setCursorPos(math.floor((w - #failText) / 2), math.floor(h / 2))
+        print(failText)
+        if term.isColor() then term.setTextColor(colors.white) end
+        sleep(2)
+        -- Will automatically loop back to ask for password again
+    end
 end
