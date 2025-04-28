@@ -1,4 +1,4 @@
--- Set your password here
+- Set your password here
 local correctPassword = "yourpassword"
 
 -- Clear screen
@@ -10,13 +10,13 @@ local w, h = term.getSize()
 
 -- Centered "Enter Password" text
 local enterText = "Enter Password:"
-term.setCursorPos((w - #enterText) // 2, h // 2 - 2)
+term.setCursorPos(math.floor((w - #enterText) / 2), math.floor(h / 2) - 2)
 print(enterText)
 
 -- Draw a simple input box
 local boxWidth = 20
-local boxStartX = (w - boxWidth) // 2
-local boxY = h // 2
+local boxStartX = math.floor((w - boxWidth) / 2)
+local boxY = math.floor(h / 2)
 
 -- Draw top of box
 term.setCursorPos(boxStartX, boxY)
