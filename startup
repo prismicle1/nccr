@@ -1,37 +1,51 @@
 -- Set your password here
-local password = "mypassword"
+local correctPassword = "yourpassword"
 
--- Clear and center the prompt
+-- Clear screen
 term.clear()
 term.setCursorPos(1,1)
+
+-- Get screen size
 local w, h = term.getSize()
-local function centerPrint(text, y)
-    term.setCursorPos((w - #text) // 2 + 1, y)
-    term.write(text)
-end
 
--- Draw the password box
-centerPrint("Enter Password:", h//2 - 1)
+-- Centered "Enter Password" text
+local enterText = "Enter Password:"
+term.setCursorPos(math.floor((w - #enterText) / 2), math.floor(h / 2) - 2)
+print(enterText)
+
+-- Draw a simple input box
 local boxWidth = 20
-local boxX = (w - boxWidth) // 2
-local boxY = h // 2
-term.setCursorPos(boxX, boxY)
-term.write(string.rep("_", boxWidth))
+local boxStartX = math.floor((w - boxWidth) / 2)
+local boxY = math.floor(h / 2)
 
--- Get password input
-term.setCursorPos(boxX, boxY)
-local input = read("*") -- '*' masks input
+-- Draw top of box
+term.setCursorPos(boxStartX, boxY)
+write("+" .. string.rep("-", boxWidth - 2) .. "+")
+
+-- Draw middle (where typing will happen)
+term.setCursorPos(boxStartX, boxY + 1)
+write("|" .. string.rep(" ", boxWidth - 2) .. "|")
+
+-- Draw bottom of box
+term.setCursorPos(boxStartX, boxY + 2)
+write("+" .. string.rep("-", boxWidth - 2) .. "+")
+
+-- Move cursor inside the box for typing
+term.setCursorPos(boxStartX + 1, boxY + 1)
+local input = read()
+
+-- Clear screen again
+term.clear()
+term.setCursorPos(1,1)
 
 -- Check password
-if input == password then
-    term.clear()
-    centerPrint("Access Granted", h // 2)
+if input == correctPassword then
+    print("Access Granted")
     sleep(2)
     term.clear()
-    -- Proceed past login (can put your main program here)
+    term.setCursorPos(1,1)
+    print("Main Screen:")
+    print("[File: Organizations]")
 else
-    term.clear()
-    centerPrint("Access Denied", h // 2)
-    sleep(2)
-    os.shutdown() -- or use os.reboot() if you want auto-retry
+    print("Access Denied")
 end
